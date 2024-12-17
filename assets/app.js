@@ -1,4 +1,10 @@
 import './bootstrap.js';
+
+import 'bootstrap/dist/css/bootstrap.min.css'; // Подключение стилей Bootstrap
+import 'bootstrap'; // Подключение JavaScript Bootstrap
+
+
+
 /*
  * Welcome to your app's main JavaScript file!
  *
