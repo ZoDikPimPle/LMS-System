@@ -21,7 +21,7 @@ security:
                 check_path: app_login
                 # enable_csrf: true    отключил, чтоб не мешало (так, при реальной разработке, конечно лучше включить, защита от поддлки сайта)
                 # csrf_token_id: authenticate
-                # default_target_path: /admin
+                default_target_path: /login
 
             logout:
                 path: app_logout
