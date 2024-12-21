@@ -3,6 +3,11 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block body %}
-    <h1>Welcome, Admin!</h1>
-    <p>This is your dashboard.</p>
+    <h1>Вас приветсвует Админ панель</h1>
+    <p>Возможные действия: </p>
+
+    <div class="mt-4">
+        <a href="{{ path('admin_disciplines') }}" class="btn btn-primary">Дисциплины</a>
+        <a href="{{ path('admin_accounts') }}" class="btn btn-secondary">Учетные записи</a>
+    </div>
 {% endblock %}
