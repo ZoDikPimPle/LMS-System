@@ -3,3 +3,102 @@
 body {
     background-color: skyblue;
 }
+
+/* Основной контейнер */
+.d-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.vh-30 {
+    min-height: 30vh;
+}
+
+.bg-white {
+    background-color: #ffffff;
+}
+
+.bg-primary {
+    background-color: #007bff;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+.rounded {
+    border-radius: 0.25rem;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Форма */
+.form-label {
+    font-weight: bold;
+}
+
+.form-control {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid #ffffff;
+    border-radius: 0.25rem;
+}
+
+.form-control:focus {
+    outline: none;
+    box-shadow: 0 0 0.25rem #ffffff;
+    border-color: #ffffff;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+.bg-transparent {
+    background-color: transparent;
+}
+
+.border-white {
+    border-color: #ffffff;
+}
+
+/* Кнопка */
+.btn {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    text-transform: uppercase;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-light {
+    background-color: #f8f9fa;
+    color: #000000;
+    border: none;
+}
+
+.btn-light:hover {
+    background-color: #ffffff;
+    color: #007bff;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+/* Алерт */
+.alert {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}

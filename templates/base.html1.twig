@@ -15,9 +15,6 @@
         .header {
             background-color: transparent;
             padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         .header h1 {
             color: blue; /* Синий текст */
@@ -25,29 +22,13 @@
             font-weight: bold;
             margin: 0;
         }
-        .logout-button {
-            background-color: blue; /* Цвет букв ГУАП */
-            color: white; /* Белый текст */
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .logout-button:hover {
-            background-color: darkblue; /* Более темный оттенок для hover */
-        }
-
+        
     </style>
 </head>
 <body>
     <!-- Шапка -->
     <header class="header">
         <h1>ГУАП</h1>
-        <form action="{{ path('app_logout') }}" method="post" style="margin: 0;">
-            <button type="submit" class="logout-button">Выход</button>
-        </form>
     </header>
 
     <!-- Основной контент -->

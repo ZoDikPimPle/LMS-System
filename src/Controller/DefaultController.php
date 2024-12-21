@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends AbstractController
+/*class DefaultController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
     public function index(): Response
@@ -15,4 +15,14 @@ class DefaultController extends AbstractController
         return $this->render('base.html.twig');
     }
 }
+*/
 
+class DefaultController extends AbstractController
+{
+    #[Route('/', name: 'app_home')]
+    public function index(): Response
+    {
+        // Перенаправление на страницу логина
+        return $this->redirectToRoute('app_login');
+    }
+}

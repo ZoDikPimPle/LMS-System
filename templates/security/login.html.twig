@@ -1,23 +1,27 @@
 {# templates/login/index.html.twig #}
-{% extends 'base.html.twig' %}
-
+{% extends 'base.html1.twig' %}
 {# ... #}
 
 {% block body %}
-    {% if error %}
-        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+<div class="d-flex justify-content-center align-items-center vh-30 bg-white">
+    <div class="p-4 bg-primary text-white rounded shadow">
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
 
-    <form action="{{ path('app_login') }}" method="post">
-        <label for="username">Email:</label>
-        <input type="text" id="username" name="_username" value="{{ last_username }}" required>
+        <form action="{{ path('app_login') }}" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Email:</label>
+                <input type="text" id="username" name="_username" class="form-control text-white bg-transparent border-white" value="{{ last_username }}" required placeholder="Введите ваш email">
+            </div>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="_password" required>
+            <div class="mb-3">
+                <label for="password" class="form-label">Пароль:</label>
+                <input type="password" id="password" name="_password" class="form-control text-white bg-transparent border-white" required placeholder="Введите ваш пароль">
+            </div>
 
-        {# If you want to control the URL the user is redirected to on success
-        <input type="hidden" name="_target_path" value="/account"> #}
-
-        <button type="submit">login</button>
-    </form>
+            <button type="submit" class="btn btn-light w-100">Вход</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
