@@ -18,6 +18,8 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "bootstrap": "5.2"
+        "bootstrap": "5.2",
+        "datatables.net": "^2.1.8",
+        "datatables.net-bs5": "^2.1.8"
     }
 }

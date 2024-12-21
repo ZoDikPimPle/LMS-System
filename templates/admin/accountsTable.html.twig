@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Users Table{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Пользователи</h1>
+        <select id="roleFilter" class="form-select mb-3">
+            <option value="">Все роли</option>
+            <option value="ROLE_ADMIN">Администратор</option>
+            <option value="ROLE_TEACHER">Преподаватель</option>
+            <option value="ROLE_STUDENT">Студент</option>
+        </select>
+        <table id="usersTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Роли</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Данные будут загружаться через AJAX -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const table = $('#usersTable').DataTable({
+            ajax: {
+                url: '{{ path("admin_users_data") }}',
+                dataSrc: '',
+            },
+            columns: [
+                { data: 'id' },
+                { 
+                    data: 'email',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return `<span class="editable" data-field="email" data-id="${row.id}">${data}</span>`;
+                        }
+                        return data;
+                    }
+                },
+                { 
+                    data: 'roles',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return `<span class="editable" data-field="roles" data-id="${row.id}">${data}</span>`;
+                        }
+                        return data;
+                    }
+                }
+            ]
+        });
+
+        // Обработчик клика на редактируемые ячейки
+        $('#usersTable').on('click', '.editable', function () {
+            const span = $(this);
+            const originalValue = span.text();
+            const field = span.data('field');
+            const id = span.data('id');
+
+            // Создаем input для редактирования
+            const input = $(`<input type="text" class="form-control" value="${originalValue}">`);
+            span.replaceWith(input);
+            input.focus();
+
+            input.on('blur', function () {
+                const newValue = input.val();
+
+                if (newValue !== originalValue) {
+                    $.ajax({
+                        url: '{{ path("admin_users_update") }}',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id, field, value: newValue }),
+                        success: function () {
+                            table.ajax.reload(); // Перезагрузка данных таблицы после успешного обновления
+                        },
+                        error: function () {
+                            alert('Error updating field. Please try again.');
+                            input.replaceWith(`<span class="editable" data-field="${field}" data-id="${id}">${originalValue}</span>`);
+                        }
+                    });
+                } else {
+                    input.replaceWith(`<span class="editable" data-field="${field}" data-id="${id}">${originalValue}</span>`);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+{% endblock %}
