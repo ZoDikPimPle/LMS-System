@@ -21,7 +21,7 @@ security:
                 check_path: app_login
                 # enable_csrf: true    отключил, чтоб не мешало (так, при реальной разработке, конечно лучше включить, защита от поддлки сайта)
                 # csrf_token_id: authenticate
-                default_target_path: /admin
+                # default_target_path: /admin
 
             logout:
                 path: app_logout
@@ -38,6 +38,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/admin, roles: [ROLE_ADMIN] }
+        - { path: ^/student, roles: [ROLE_STUDENT] }
+        - { path: ^/teacher, roles: [ROLE_TEACHER] }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
