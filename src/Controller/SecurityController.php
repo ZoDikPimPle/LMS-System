@@ -17,6 +17,12 @@ class SecurityController extends AbstractController
         if (in_array('ROLE_ADMIN', $user->getRoles())) {
             return $this->redirectToRoute('admin_dashboard'); // Перенаправление для админа
         }
+        if (in_array('ROLE_TEACHER', $user->getRoles())) {
+            return $this->redirectToRoute('teacher_dashboard'); // Перенаправление для учителя 
+        }
+        if (in_array('ROLE_STUDENT', $user->getRoles())) {
+            return $this->redirectToRoute('student_dashboard'); // Перенаправление для студента
+        }
     }
 
     // Получение ошибки входа
@@ -42,6 +48,22 @@ class SecurityController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         return $this->render('admin/dashboard.html.twig');
+    }
+
+    #[Route(path: '/teacher', name: 'teacher_dashboard')] # teacher panel
+    public function teacherDashboard(): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_TEACHER');
+
+        return $this->render('teacher/dashboard.html.twig');
+    }
+
+    #[Route(path: '/student', name: 'student_dashboard')] # - student panel
+    public function srudentDashboard(): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_STUDENT');
+
+        return $this->render('student/dashboard.html.twig');
     }
 
 }
