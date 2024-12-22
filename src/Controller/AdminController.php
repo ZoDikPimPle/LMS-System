@@ -131,4 +131,31 @@ class AdminController extends AbstractController
             return new JsonResponse(['error' => 'Ошибка при добавлении пользователя: ' . $e->getMessage()], 500);
         }
     }
+
+    #[Route('/admin/users/delete', name: 'admin_users_delete', methods: ['POST'])]
+    public function deleteUser(
+    Request $request,
+    UserRepository $userRepository,
+    EntityManagerInterface $em
+    ): JsonResponse 
+    {
+        $data = json_decode($request->getContent(), true);
+        $id = $data['id'] ?? null;
+
+        if (!$id) {
+            return new JsonResponse(['error' => 'ID пользователя не указан'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $userRepository->find($id);
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'Пользователь не найден'], Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($user);
+        $em->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
 }

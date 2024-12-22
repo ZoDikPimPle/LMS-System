@@ -17,6 +17,7 @@
                     <th>ID</th>
                     <th>Email</th>
                     <th>Роли</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,115 +65,6 @@
         </div>
     </div>
 
-<!--
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const table = $('#usersTable').DataTable({
-            ajax: {
-                url: '{{ path("admin_users_data") }}',
-                dataSrc: '',
-            },
-            success: function () {
-                table.ajax.reload(); // Перезагрузка данных таблицы
-            },
-
-            columns: [
-                { data: 'id' },
-                { 
-                    data: 'email',
-                    render: function(data, type, row) {
-                        if (type === 'display') {
-                            return `<span class="editable" data-field="email" data-id="${row.id}">${data}</span>`;
-                        }
-                        return data;
-                    }
-                },
-                { 
-                    data: 'roles',
-                    render: function(data, type, row) {
-                        if (type === 'display') {
-                            return `<span class="editable" data-field="roles" data-id="${row.id}">${data}</span>`;
-                        }
-                        return data;
-                    }
-                }
-            ]
-        });
-
-        // Обработчик клика на редактируемые ячейки
-        $('#usersTable').on('click', '.editable', function () {
-            const span = $(this);
-            const originalValue = span.text();
-            const field = span.data('field');
-            const id = span.data('id');
-
-            // Создаем input для редактирования
-            const input = $(`<input type="text" class="form-control" value="${originalValue}">`);
-            span.replaceWith(input);
-            input.focus();
-
-            input.on('blur', function () {
-                const newValue = input.val();
-
-                if (newValue !== originalValue) {
-                    $.ajax({
-                        url: '{{ path("admin_users_update") }}',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ id, field, value: newValue }),
-                        success: function () {
-                            table.ajax.reload(); // Перезагрузка данных таблицы после успешного обновления
-                        },
-                        error: function () {
-                            alert('Error updating field. Please try again.');
-                            input.replaceWith(`<span class="editable" data-field="${field}" data-id="${id}">${originalValue}</span>`);
-                        }
-                    });
-                } else {
-                    input.replaceWith(`<span class="editable" data-field="${field}" data-id="${id}">${originalValue}</span>`);
-                }
-            });
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {   // скрипт для добавления новых данных 
-    const addUserForm = document.getElementById('addUserForm');
-
-    addUserForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        const formData = new FormData(addUserForm);
-
-        fetch('{{ path("admin_add_user") }}', {
-            method: 'POST',
-            body: JSON.stringify({
-                email: formData.get('email'),
-                password: formData.get('password'),
-                role: formData.get('role'),
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Ошибка при добавлении пользователя');
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert('Пользователь успешно добавлен!');
-                $('#addUserModal').modal('hide');
-                table.ajax.reload(); // Обновляем таблицу
-            })
-            /*.catch(error => {
-                alert('Ошибка: ' + error.message);
-            });*/
-    });
-});
-
-</script>  --> 
-
 <script>
     // Объявляем переменную table в глобальной области видимости
     let table;
@@ -203,9 +95,42 @@
                         }
                         return data;
                     }
+                },
+                // Добавляем запятую здесь
+                {
+                    data: null, 
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        return `<button class="btn btn-danger btn-sm delete-user" data-id="${row.id}">Удалить</button>`;
+                    }
                 }
             ]
+
         });
+
+        // Обработчик клика на кнопке удаления
+            $('#usersTable').on('click', '.delete-user', function () {
+                const userId = $(this).data('id');
+                const confirmDelete = confirm('Вы уверены, что хотите удалить этого пользователя?');
+
+                if (confirmDelete) {
+                    $.ajax({
+                        url: '{{ path("admin_users_delete") }}',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: userId }),
+                        success: function () {
+                            alert('Пользователь успешно удалён');
+                            table.ajax.reload(); // Перезагрузка таблицы
+                        },
+                        error: function () {
+                            alert('Ошибка при удалении пользователя. Попробуйте снова.');
+                        }
+                    });
+                }
+            });
+
 
         // Обработчик клика на редактируемые ячейки
         $('#usersTable').on('click', '.editable', function () {
@@ -222,9 +147,10 @@
             input.on('blur', function () {
                 const newValue = input.val();
 
-                if (newValue !== originalValue) {
+                if (newValue !== originalValue) 
+                {
                     $.ajax({
-                        url: '{{ path("admin_users_update") }}',
+                        url: '{{ path('admin_users_update') }}',
                         method: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({ id, field, value: newValue }),
