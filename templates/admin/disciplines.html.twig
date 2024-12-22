@@ -1,8 +1,97 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Дисциплины{% endblock %}
+{% block title %}Disciplines Management{% endblock %}
 
 {% block body %}
-    <h1>Админ Дисциплины</h1>
-    <p>123</p>
+<div class="container mt-5">
+    <h1>Управление дисциплинами</h1>
+
+    <!-- Таблица дисциплин -->
+    <table id="disciplinesTable" class="table table-striped w-100">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Дисциплина</th>
+                <th>Преподаватель</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Данные будут загружены через AJAX -->
+        </tbody>
+    </table>
+
+    <!-- Кнопка добавления -->
+    <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addDisciplineModal">
+        Добавить дисциплину
+    </button>
+</div>
+
+<!-- Модальное окно для добавления -->
+<div class="modal fade" id="addDisciplineModal" tabindex="-1" aria-labelledby="addDisciplineModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDisciplineModalLabel">Добавить новую дисциплину</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDisciplineForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Название дисциплины</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="teacher" class="form-label">Преподаватель</label>
+                        <select class="form-select" id="teacher" name="teacher" required>
+                            <option value="">Выберите преподавателя</option>
+                            {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}">{{ teacher.email }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const table = $('#disciplinesTable').DataTable({
+            ajax: {
+                url: '{{ path("admin_disciplines_data") }}',
+                dataSrc: ''
+            },
+            columns: [
+                { data: 'id' },
+                { data: 'name' },
+                { data: 'teacher_email' }
+            ]
+        });
+
+        // Обработчик формы добавления
+        document.getElementById('addDisciplineForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('{{ path("admin_disciplines_add") }}', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    teacher: formData.get('teacher')
+                }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert('Дисциплина успешно добавлена!');
+                $('#addDisciplineModal').modal('hide');
+                table.ajax.reload();
+            })
+            .catch(() => alert('Ошибка при добавлении дисциплины.'));
+        });
+    });
+</script>
 {% endblock %}

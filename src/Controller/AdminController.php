@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Subject;
 use App\Repository\UserRepository;
+use App\Repository\SubjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,13 +25,13 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/disciplines', name: 'admin_disciplines')]
+   /* #[Route('/admin/disciplines', name: 'admin_disciplines')]
     public function disciplines(): Response
     {
         return $this->render('admin/disciplines.html.twig', [
             'controller_name' => 'AdminController',
         ]);
-    }
+    }*/
 
     #[Route('/admin/accountsTable', name: 'admin_accounts_table')]
     public function accountsTable(): Response
@@ -157,5 +159,54 @@ class AdminController extends AbstractController
 
         return new JsonResponse(['success' => true]);
     }
+
+    #[Route('/admin/disciplines', name: 'admin_disciplines')]
+    public function disciplines(UserRepository $userRepository): Response
+    {
+        return $this->render('admin/disciplines.html.twig', [
+            'teachers' => $userRepository->findByRole('ROLE_TEACHER'),
+        ]);
+
+        $teachers = $userRepository->findByRole('ROLE_TEACHER');
+
+        return $this->render('admin/disciplines.html.twig', [
+            'teachers' => $teachers, // Передаем список преподавателей в шаблон
+        ]);
+    }
+    
+    #[Route('/admin/disciplines/data', name: 'admin_disciplines_data')]
+    public function getDisciplinesData(SubjectRepository $subjectRepository): JsonResponse
+    {
+        $data = array_map(function (Subject $subject) {
+            return [
+                'id' => $subject->getId(),
+                'name' => $subject->getName(),
+                'teacher_email' => $subject->getTeacher()->getEmail(),
+            ];
+        }, $subjectRepository->findAll());
+    
+        return new JsonResponse($data);
+    }
+    
+    #[Route('/admin/disciplines/add', name: 'admin_disciplines_add', methods: ['POST'])]
+    public function addDiscipline(Request $request, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+    
+        $teacher = $userRepository->find($data['teacher']);
+        if (!$teacher) {
+            return new JsonResponse(['error' => 'Преподаватель не найден'], 404);
+        }
+    
+        $subject = new Subject();
+        $subject->setName($data['name']);
+        $subject->setTeacher($teacher);
+    
+        $em->persist($subject);
+        $em->flush();
+    
+        return new JsonResponse(['success' => true]);
+    }
+    
 
 }

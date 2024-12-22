@@ -3,14 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\SubjectRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubjectRepository::class)]
 class Subject
 {
-    // Ваши текущие поля
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -19,25 +16,26 @@ class Subject
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: 'text')]
-    private ?string $description = null;
-
-    // Связь с преподавателем (OneToMany)
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'subjectsTeaching')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $teacher = null;
 
-    // Связь со студентами (ManyToMany)
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'subjectsStudying')]
-    #[ORM\JoinTable(name: 'subject_students')]
-    private Collection $students;
-
-    public function __construct()
+    public function getId(): ?int
     {
-        $this->students = new ArrayCollection();
+        return $this->id;
     }
 
-    // Геттеры и сеттеры для существующих полей
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
 
     public function getTeacher(): ?User
     {
@@ -47,30 +45,6 @@ class Subject
     public function setTeacher(?User $teacher): self
     {
         $this->teacher = $teacher;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
-    public function getStudents(): Collection
-    {
-        return $this->students;
-    }
-
-    public function addStudent(User $student): self
-    {
-        if (!$this->students->contains($student)) {
-            $this->students->add($student);
-        }
-
-        return $this;
-    }
-
-    public function removeStudent(User $student): self
-    {
-        $this->students->removeElement($student);
 
         return $this;
     }
