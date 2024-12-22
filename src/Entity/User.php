@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -30,6 +32,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    // Связь с дисциплинами, которые ведет
+    #[ORM\OneToMany(mappedBy: 'teacher', targetEntity: Subject::class)]
+    private Collection $subjectsTeaching;
+
+    // Связь с дисциплинами, которые посещает
+    #[ORM\ManyToMany(mappedBy: 'students', targetEntity: Subject::class)]
+    private Collection $subjectsStudying;
+
+    public function __construct()
+    {
+        $this->subjectsTeaching = new ArrayCollection();
+        $this->subjectsStudying = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -101,5 +117,61 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // Если вы храните временные или чувствительные данные на объекте пользователя, очистите их здесь.
+    }
+
+    /**
+     * @return Collection<int, Subject>
+     */
+    public function getSubjectsTeaching(): Collection
+    {
+        return $this->subjectsTeaching;
+    }
+
+    public function addSubjectTeaching(Subject $subject): self
+    {
+        if (!$this->subjectsTeaching->contains($subject)) {
+            $this->subjectsTeaching->add($subject);
+            $subject->setTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubjectTeaching(Subject $subject): self
+    {
+        if ($this->subjectsTeaching->removeElement($subject)) {
+            if ($subject->getTeacher() === $this) {
+                $subject->setTeacher(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subject>
+     */
+    public function getSubjectsStudying(): Collection
+    {
+        return $this->subjectsStudying;
+    }
+
+    public function addSubjectStudying(Subject $subject): self
+    {
+        if (!$this->subjectsStudying->contains($subject)) {
+            $this->subjectsStudying->add($subject);
+            $subject->addStudent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubjectStudying(Subject $subject): self
+    {
+        if ($this->subjectsStudying->removeElement($subject)) {
+            $subject->removeStudent($this);
+        }
+
+        return $this;
     }
 }
