@@ -25,7 +25,47 @@
         </table>
     </div>
 
-    <script>
+    <!-- Кнопка добавления -->
+<div class="mt-3">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">Добавить нового пользователя</button>
+</div>
+
+    <!-- Всплывающее окно -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Добавить нового пользователя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Пароль</label>
+                            <input type="password" class="form-control" id="password" name="password" minlength="8" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Роль</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">Выберите роль</option>
+                                <option value="ROLE_ADMIN">Администратор</option>
+                                <option value="ROLE_TEACHER">Учитель</option>
+                                <option value="ROLE_STUDENT">Студент</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
     document.addEventListener('DOMContentLoaded', function () {
         const table = $('#usersTable').DataTable({
             ajax: {
@@ -90,6 +130,43 @@
             });
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {   // скрипт для добавления новых данных 
+    const addUserForm = document.getElementById('addUserForm');
+
+    addUserForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(addUserForm);
+
+        fetch('{{ path("admin_add_user") }}', {
+            method: 'POST',
+            body: JSON.stringify({
+                email: formData.get('email'),
+                password: formData.get('password'),
+                role: formData.get('role'),
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при добавлении пользователя');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Пользователь успешно добавлен!');
+                $('#addUserModal').modal('hide');
+                table.ajax.reload(); // Обновляем таблицу
+            })
+            /*.catch(error => {
+                alert('Ошибка: ' + error.message);
+            });*/
+    });
+});
+
 </script>
 
 
