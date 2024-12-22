@@ -64,7 +64,7 @@
         </div>
     </div>
 
-
+<!--
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const table = $('#usersTable').DataTable({
@@ -72,6 +72,10 @@
                 url: '{{ path("admin_users_data") }}',
                 dataSrc: '',
             },
+            success: function () {
+                table.ajax.reload(); // Перезагрузка данных таблицы
+            },
+
             columns: [
                 { data: 'id' },
                 { 
@@ -167,7 +171,117 @@
     });
 });
 
+</script>  --> 
+
+<script>
+    // Объявляем переменную table в глобальной области видимости
+    let table;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Инициализация DataTable
+        table = $('#usersTable').DataTable({
+            ajax: {
+                url: '{{ path("admin_users_data") }}',
+                dataSrc: '',
+            },
+            columns: [
+                { data: 'id' },
+                { 
+                    data: 'email',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return `<span class="editable" data-field="email" data-id="${row.id}">${data}</span>`;
+                        }
+                        return data;
+                    }
+                },
+                { 
+                    data: 'roles',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return `<span class="editable" data-field="roles" data-id="${row.id}">${data}</span>`;
+                        }
+                        return data;
+                    }
+                }
+            ]
+        });
+
+        // Обработчик клика на редактируемые ячейки
+        $('#usersTable').on('click', '.editable', function () {
+            const span = $(this);
+            const originalValue = span.text();
+            const field = span.data('field');
+            const id = span.data('id');
+
+            // Создаем input для редактирования
+            const input = $(`<input type="text" class="form-control" value="${originalValue}">`);
+            span.replaceWith(input);
+            input.focus();
+
+            input.on('blur', function () {
+                const newValue = input.val();
+
+                if (newValue !== originalValue) {
+                    $.ajax({
+                        url: '{{ path("admin_users_update") }}',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id, field, value: newValue }),
+                        success: function () {
+                            table.ajax.reload(); // Перезагрузка данных таблицы после успешного обновления
+                        },
+                        error: function () {
+                            alert('Error updating field. Please try again.');
+                            input.replaceWith(`<span class="editable" data-field="${field}" data-id="${id}">${originalValue}</span>`);
+                        }
+                    });
+                } else {
+                    input.replaceWith(`<span class="editable" data-field="${field}" data-id="${id}">${originalValue}</span>`);
+                }
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const addUserForm = document.getElementById('addUserForm');
+
+        addUserForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(addUserForm);
+
+            fetch('{{ path("admin_add_user") }}', {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    role: formData.get('role'),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка при добавлении пользователя');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Пользователь успешно добавлен!');
+                    $('#addUserModal').modal('hide');
+                    if (table) {
+                        table.ajax.reload(); // Обновляем таблицу
+                    }
+                })
+                .catch(error => {
+                    alert('Ошибка: ' + error.message);
+                });
+        });
+    });
 </script>
+
 
 
 
