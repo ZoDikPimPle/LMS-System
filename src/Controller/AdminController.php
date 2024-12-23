@@ -187,6 +187,48 @@ class AdminController extends AbstractController
     
         return new JsonResponse($data);
     }
+/* Не логично оставлять возможность такого редактирования 
+    #[Route('/admin/disciplines/update', name: 'admin_disciplines_update', methods: ['POST'])]
+    public function updateDiscipline(
+    Request $request,
+    SubjectRepository $subjectRepository,
+    EntityManagerInterface $em
+    ): JsonResponse {
+    $data = json_decode($request->getContent(), true);
+    $id = $data['id'] ?? null;
+    $field = $data['field'] ?? null;
+    $value = $data['value'] ?? null;
+
+    if (!$id || !$field || !$value) {
+        return new JsonResponse(['error' => 'Invalid input'], Response::HTTP_BAD_REQUEST);
+    }
+
+    $discipline = $subjectRepository->find($id);
+
+    if (!$discipline) {
+        return new JsonResponse(['error' => 'Discipline not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    // Обновляем указанное поле
+    switch ($field) {
+        case 'name':
+            $discipline->setName($value);
+            break;
+        case 'teacher_email':
+            if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                $discipline->getTeacher()->setEmail($value);
+            } else {
+                return new JsonResponse(['error' => 'Invalid email format'], Response::HTTP_BAD_REQUEST);
+            }
+            break;
+        default:
+            return new JsonResponse(['error' => 'Invalid field'], Response::HTTP_BAD_REQUEST);
+    }
+
+    $em->flush();
+
+    return new JsonResponse(['success' => true]);
+}*/ 
     
     #[Route('/admin/disciplines/add', name: 'admin_disciplines_add', methods: ['POST'])]
     public function addDiscipline(Request $request, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
@@ -208,5 +250,5 @@ class AdminController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
     
-
+    
 }
