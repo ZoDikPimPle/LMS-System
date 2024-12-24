@@ -4,6 +4,9 @@ namespace App\Entity;
 
 use App\Repository\SubjectRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+
 
 #[ORM\Entity(repositoryClass: SubjectRepository::class)]
 class Subject
@@ -48,4 +51,38 @@ class Subject
 
         return $this;
     }
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'subjectsStudying')]
+    private Collection $students;
+    
+    public function __construct()
+    {
+        $this->students = new ArrayCollection();
+    }
+    
+    public function getStudents(): Collection
+    {
+        return $this->students;
+    }
+    
+    public function addStudent(User $student): self
+    {
+        if (!$this->students->contains($student)) {
+            $this->students->add($student);
+            $student->addSubjectStudying($this);
+        }
+    
+        return $this;
+    }
+    
+    public function removeStudent(User $student): self
+    {
+        if ($this->students->removeElement($student)) {
+            $student->removeSubjectStudying($this);
+        }
+    
+        return $this;
+    }
+    
+
 }

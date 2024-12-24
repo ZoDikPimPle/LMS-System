@@ -39,6 +39,12 @@ class AdminController extends AbstractController
         return $this->render('admin/accountsTable.html.twig');
     }
 
+    #[Route('/admin/disciplines_student', name: 'admin_disciplines_student')]
+    public function disciplines_student(): Response
+    {
+        return $this->render('admin/disciplines_student..html.twig');
+    }
+
     #[Route('/admin/users/data', name: 'admin_users_data')]
     public function getUsersData(UserRepository $userRepository): JsonResponse
     {
@@ -250,5 +256,40 @@ class AdminController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
     
-    
+    #[Route('/admin/disciplines_student', name: 'admin_disciplines_student')]
+    public function disciplinesStudent(SubjectRepository $subjectRepository, UserRepository $userRepository): Response
+    {
+        $subjects = $subjectRepository->findAll();
+        $students = $userRepository->findByRole('ROLE_STUDENT');
+
+        return $this->render('admin/disciplines_student.html.twig', [
+            'subjects' => $subjects,
+            'students' => $students,
+        ]);
+    }
+
+    #[Route('/admin/disciplines_student/assign', name: 'admin_disciplines_student_assign', methods: ['POST'])]
+    public function assignStudentToSubject(Request $request, SubjectRepository $subjectRepository, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $subjectId = $data['subjectId'] ?? null;
+        $studentId = $data['studentId'] ?? null;
+
+        if (!$subjectId || !$studentId) {
+            return new JsonResponse(['error' => 'Invalid input'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $subject = $subjectRepository->find($subjectId);
+        $student = $userRepository->find($studentId);
+
+        if (!$subject || !$student) {
+            return new JsonResponse(['error' => 'Subject or Student not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $student->addSubjectStudying($subject);
+        $em->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
 }
