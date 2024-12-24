@@ -1,8 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TEACHER Dashboard{% endblock %}
+{% block title %}Teacher Dashboard{% endblock %}
 
 {% block body %}
-    <h1>Welcome, teacher!</h1>
-    <p>This is your dashboard.</p>
+    <h1>Welcome, {{ app.user.email }}!</h1>
+    <h2>Your Subjects</h2>
+    <ul>
+        {% for subject in subjects %}
+            <li>
+                <a href="{{ path('teacher_subject_students', { id: subject.id }) }}">
+                    {{ subject.name }}
+                </a>
+            </li>
+        {% else %}
+            <li>You have no subjects assigned.</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Студент по предмету: {{ subject.name }}{% endblock %}
+
+{% block body %}
+    <h1>Оценка студента по предмету: {{ subject.name }}</h1>
+    <ul>
+        {% for student in students %}
+            <li>
+                {{ student.email }}
+                <form data-student-id="{{ student.id }}" data-subject-id="{{ subject.id }}" class="grade-form">
+                    <label for="grade">Оценка:</label>
+                    <input type="number" name="grade" min="1" max="5" required>
+                    <button type="submit">Добавить оценку</button>
+                </form>
+            </li>
+        {% else %}
+            <li>Студентов нет.</li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        document.querySelectorAll('.grade-form').forEach(form => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const studentId = form.dataset.studentId;
+                const subjectId = form.dataset.subjectId;
+                const grade = form.querySelector('input[name="grade"]').value;
+
+                const response = await fetch('{{ path('teacher_grade_create') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, subjectId, grade }),
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Grade added successfully!');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            });
+        });
+    </script>
+{% endblock %}
