@@ -3,6 +3,7 @@
 {% block body %}
 <h1>Привязка студента к предмету</h1>
 
+<!-- Форма для привязки студента к предмету -->
 <form id="assignForm">
     <label for="subject">Выберите предмет:</label>
     <select id="subject" name="subject">
@@ -21,6 +22,39 @@
     <button type="submit">Привязать</button>
 </form>
 
+<!-- Таблица текущих связей студентов с предметами -->
+<h2>Текущие связи студентов с предметами</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Студент</th>
+            <th>Email</th>
+            <th>Предметы</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+            <tr>
+                <td>{{ student.id }}</td>
+                <td>{{ student.email }}</td>
+                <td>
+                    <ul>
+                        {% for subject in student.subjectsStudying %}
+                            <li>{{ subject.name }}</li>
+                        {% else %}
+                            <li>Нет предметов</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">Нет данных о студентах</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <script>
     document.getElementById('assignForm').addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -36,6 +70,7 @@
         const result = await response.json();
         if (result.success) {
             alert('Студент успешно привязан!');
+            location.reload(); // Обновляем страницу для отображения обновленных данных
         } else {
             alert('Ошибка: ' + result.error);
         }
