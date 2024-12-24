@@ -94,6 +94,42 @@ class TeacherController extends AbstractController
     #[Route('/teacher/subject/{id}/students', name: 'teacher_subject_students')]
     public function students_grade(
         Subject $subject,
+        GradeRepository $gradeRepository
+    ): Response {
+        $teacher = $this->getUser();
+    
+        if ($subject->getTeacher() !== $teacher) {
+            throw $this->createAccessDeniedException('This is not your subject.');
+        }
+    
+        // Получаем список студентов для данного предмета
+        $students = $subject->getStudents();
+    
+        // Получаем все оценки студентов по данному предмету
+        $grades = $gradeRepository->findBy(['subject' => $subject]);
+    
+        // Создаем массив оценок студентов
+        $studentGrades = [];
+        foreach ($students as $student) {
+            $studentGrades[$student->getId()] = [];
+            foreach ($grades as $grade) {
+                if ($grade->getStudent()->getId() === $student->getId()) {
+                    $studentGrades[$student->getId()][] = $grade->getGrade(); // Добавляем все оценки
+                }
+            }
+        }
+    
+        return $this->render('teacher/subject_students.html.twig', [
+            'subject' => $subject,
+            'students' => $students,
+            'studentGrades' => $studentGrades,
+        ]);
+    }
+    
+/*
+    #[Route('/teacher/subject/{id}/students', name: 'teacher_subject_students')]
+    public function students_grade(
+        Subject $subject,
         GradeRepository $gradeRepository // Добавляем репозиторий оценок
     ): Response
     {
@@ -126,5 +162,5 @@ class TeacherController extends AbstractController
             'studentGrades' => $studentGrades, // Убедитесь, что передаете эту переменную
         ]);
     }
-
+*/
 }

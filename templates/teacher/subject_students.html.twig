@@ -41,7 +41,7 @@
                 const result = await response.json();
                 if (result.success) {
                     alert('Оценка успешно добавлена!');
-                    location.reload(); // Обновить страницу, чтобы увидеть новую оценку
+                    location.reload(); // Перезагрузить страницу, чтобы увидеть обновленный список оценок
                 } else {
                     alert('Ошибка: ' + result.error);
                 }

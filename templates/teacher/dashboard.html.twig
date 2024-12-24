@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Teacher Dashboard{% endblock %}
+{% block title %}Личный кабинет преподавателя{% endblock %}
 
 {% block body %}
-    <h1>Welcome, {{ app.user.email }}!</h1>
-    <h2>Your Subjects</h2>
+    <h1>Здравствуйте {{ app.user.email }}!</h1>
+    <h2>Ваши предметы</h2>
     <ul>
         {% for subject in subjects %}
             <li>
@@ -13,7 +13,7 @@
                 </a>
             </li>
         {% else %}
-            <li>You have no subjects assigned.</li>
+            <li>У вас нет предметов</li>
         {% endfor %}
     </ul>
 {% endblock %}
