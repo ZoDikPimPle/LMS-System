@@ -1,17 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Студент по предмету: {{ subject.name }}{% endblock %}
+{% block title %}Студенты по предмету: {{ subject.name }}{% endblock %}
 
 {% block body %}
-    <h1>Оценка студента по предмету: {{ subject.name }}</h1>
+    <h1>Оценки студентов по предмету: {{ subject.name }}</h1>
     <ul>
         {% for student in students %}
             <li>
-                {{ student.email }}
-                <form data-student-id="{{ student.id }}" data-subject-id="{{ subject.id }}" class="grade-form">
-                    <label for="grade">Оценка:</label>
-                    <input type="number" name="grade" min="1" max="5" required>
-                    <button type="submit">Добавить оценку</button>
+                {{ student.email }} | 
+                Оценки: 
+                {% if studentGrades[student.id] is not empty %}
+                    {{ studentGrades[student.id]|join(', ') }}
+                {% else %}
+                    Нет оценок
+                {% endif %} | 
+                <form data-student-id="{{ student.id }}" data-subject-id="{{ subject.id }}" class="grade-form" style="display: inline;">
+                    <input type="number" name="grade" min="1" max="5" required placeholder="Оценка">
+                    <button type="submit">Добавить</button>
                 </form>
             </li>
         {% else %}
@@ -36,6 +41,7 @@
                 const result = await response.json();
                 if (result.success) {
                     alert('Оценка успешно добавлена!');
+                    location.reload(); // Обновить страницу, чтобы увидеть новую оценку
                 } else {
                     alert('Ошибка: ' + result.error);
                 }
